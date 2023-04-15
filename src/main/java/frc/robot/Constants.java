@@ -1,6 +1,5 @@
 package frc.robot;
 
-import java.util.function.BooleanSupplier;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 
@@ -83,19 +82,21 @@ public final class Constants {
         /* Swerve Profiling Values */
         /** Meters per Second */
         public static final double maxSpeed = 0.45; //TODO: This must be tuned to specific robot
+
+        public static final double turbomaxSpeed = 2; //TODO: This must be tuned to specific robot
+        
+        public static final double precisionmaxSpeed = 0.1;//TODO: This must be tuned to specific robot
+
         /** Radians per Second */
         public static final double maxAngularVelocity = 0.75; //TODO: This must be tuned to specific robot
         
-        public static final double turbomaxSpeed = 2;
-
-        public static final double precisionmaxSpeed = 0.1;
-
-        public static final double precisionmaxAngularVelocity = 0.075;
+        public static final double precisionmaxAngularVelocity = 0.075; //TODO: This must be tuned to specific robot
+        
 
         /* Neutral Modes */
         public static final NeutralMode angleNeutralMode = NeutralMode.Coast;
         public static final NeutralMode driveNeutralMode = NeutralMode.Brake;
-        public static final double Autospeed = 10;
+        
 
         /* Module Specific Constants */
         /* Front Left Module - Module 0 */
@@ -139,6 +140,8 @@ public final class Constants {
         }
     }
 
+    
+
     public static final class AutoConstants { //TODO: The below constants are used in the example auto, and must be tuned to specific robot
         public static final double kMaxSpeedMetersPerSecond = 10;
         public static final double kMaxAccelerationMetersPerSecondSquared = 1.5;
@@ -154,39 +157,6 @@ public final class Constants {
             new TrapezoidProfile.Constraints(
                 kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
     }
-
-    /*Brazo constants */
-    public static final int CamMotorID = 23;
-    public static final int RailMotorID = 24;
-
-    public static final int camContinousCurrentLimit = 25;
-    public static final int camPeakCurrentLimit = 40;
-    public static final double camPeakCurrentDuration = 0.1;
-    public static final boolean camEnableCurrentLimit = true;
-
-    public static final double camKP = 0.3;
-    public static final double camKI = 0;
-    public static final double camKD = 0;
-    public static final double camKF = 0;
-
-    /*Riel*/
-    public static final int railContinousCurrentLimit = 25;
-    public static final int railPeakCurrentLimit = 40;
-    public static final double railPeakCurrentDuration = 0.1;
-    public static final boolean railEnableCurrentLimit = true;
-
-    public static final double railKP = 0.4;
-    public static final double railKI = 0;
-    public static final double railKD = 0;
-    public static final double railKIz = 0;
-    public static final double railKFF = 0;
-    
-    public static final double KMinOutput = -0.65;
-    public static final double kMaxOutput = 0.65;
-
-
-    public static final int LeftGripperMotorID = 21;
-    public static final int RightGripperMotorID = 22;
 
 
 }

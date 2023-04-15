@@ -4,6 +4,7 @@
 package frc.robot.autos;
 
 
+import frc.robot.Constants;
 import frc.robot.subsystems.Swerve;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -18,17 +19,13 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.auto.PIDConstants;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
 
-import frc.robot.subsystems.Brazo;
-import frc.robot.subsystems.Gripper;
-import frc.robot.Constants;
-import frc.robot.commands.BooleanArmControl;
 
 
 
 
 public class GP_Balance extends SequentialCommandGroup {
 
-  public GP_Balance(Swerve s_Swerve, Brazo b_Brazo, Gripper g_Gripper) {
+  public GP_Balance(Swerve s_Swerve) {
 
     final List<PathPlannerTrajectory> pathGroup = PathPlanner.loadPathGroup(
     "GP&Balance", 
@@ -38,14 +35,8 @@ public class GP_Balance extends SequentialCommandGroup {
     new PathConstraints(1, 0.3));
 
     HashMap<String, Command> eventMap = new HashMap<>();
-    eventMap.put("putAway", new BooleanArmControl(b_Brazo, true, false, false, false, false, false, false));
-    eventMap.put("intakeDown", new BooleanArmControl(b_Brazo, false, true, false, false, false, false, false));
-    eventMap.put("intakeMid", new BooleanArmControl(b_Brazo, false, false, true, false, false, false, false));
-    eventMap.put("intakeHigh", new BooleanArmControl(b_Brazo, false, false, false, true, false, false, false));
-    eventMap.put("come", new InstantCommand(() -> g_Gripper.come()));
-    eventMap.put("escupe", new InstantCommand(() -> g_Gripper.escupe()));
-    eventMap.put("quieto", new InstantCommand(() -> g_Gripper.quieto()));
-    eventMap.put("agarra", new BooleanArmControl(b_Brazo, false, true, false, false, false, false, true));
+    //eventMap.put("putAway", new BooleanArmControl(b_Brazo, true, false, false, false, false, false, false));
+    
 
 
 

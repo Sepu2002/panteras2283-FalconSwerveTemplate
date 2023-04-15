@@ -1,34 +1,24 @@
 package frc.robot;
 
-
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.networktables.GenericEntry;
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
-import frc.robot.autos.GP_Balance;
+
 import frc.robot.autos.PathPlanerAuto;
-import frc.robot.autos.TWGP_Balance;
-import frc.robot.commands.ArmControl;
+
+
 import frc.robot.commands.TeleopSwerve;
-import frc.robot.subsystems.Brazo;
-import frc.robot.subsystems.Gripper;
+
 import frc.robot.subsystems.Swerve;
 
-import com.pathplanner.lib.PathConstraints;
-import com.pathplanner.lib.PathPlanner;
-import com.pathplanner.lib.PathPlannerTrajectory;
-import com.pathplanner.lib.PathPoint;
+
 
 
 
@@ -41,8 +31,7 @@ import com.pathplanner.lib.PathPoint;
 public class RobotContainer {
     /* Controllers */
     private final Joystick driver = new Joystick(0);
-    private final Joystick codriver = new Joystick(1);
-    private final Joystick driverSation = new Joystick(2);
+
 
 
 
@@ -57,34 +46,19 @@ public class RobotContainer {
     private final JoystickButton turboBumper = new JoystickButton(driver, XboxController.Button.kLeftStick.value);
     private final JoystickButton precisionBumper = new JoystickButton(driver, XboxController.Button.kRightBumper.value);
     private final JoystickButton AutoPilot = new JoystickButton(driver, XboxController.Button.kA.value);
-
-    /*CoDriver Buttons */
-    private final JoystickButton Low = new JoystickButton(codriver, XboxController.Button.kA.value);
-    private final JoystickButton Mid = new JoystickButton(codriver, XboxController.Button.kB.value);
-    private final JoystickButton High = new JoystickButton(codriver, XboxController.Button.kY.value);
-    private final JoystickButton Close = new JoystickButton(codriver, XboxController.Button.kX.value);
-    private final JoystickButton RielAtras = new JoystickButton(codriver, XboxController.Button.kLeftStick.value);
-    private final POVButton Retraer = new POVButton(codriver, 0);
-    private final POVButton Extender = new POVButton(codriver, 180);
-
-    private final JoystickButton Comer = new JoystickButton(codriver, XboxController.Button.kLeftBumper.value);
-    private final JoystickButton Escupir = new JoystickButton(codriver, XboxController.Button.kRightBumper.value);
-    
+   
 
     /* Subsystems */
     private final Swerve s_Swerve = new Swerve();
-    private final Brazo b_Brazo = new Brazo();
-    private final Gripper g_Gripper = new Gripper();
 
-    /*Estructuras shuffleboard */
+    /*Shuffleboard structures */
     SendableChooser<Command> m_Autochooser = new SendableChooser<>();
     
     
 
-    /*Lista de Autónomos */
+    /*AUTO list */
     private final Command m_AutoEjemplo = new PathPlanerAuto(s_Swerve);
-    private final Command m_GP_Balance = new GP_Balance(s_Swerve, b_Brazo, g_Gripper);
-    private final Command m_TWGP_Balance = new TWGP_Balance(s_Swerve, b_Brazo, g_Gripper);
+
 
     
 
@@ -93,13 +67,10 @@ public class RobotContainer {
     public RobotContainer() {
         
 
-        m_Autochooser.setDefaultOption("Auto Ejemplo", m_AutoEjemplo);
-        m_Autochooser.addOption("GPBalance", m_GP_Balance);
-        m_Autochooser.addOption("TWGP_Balance", m_TWGP_Balance);
-
+        m_Autochooser.setDefaultOption("Example Auto", m_AutoEjemplo);
+        
         Shuffleboard.getTab("Dashboard").add(m_Autochooser).withPosition(0, 0);
-    
-        final Boolean DashLow =  Shuffleboard.getTab("Dashboard").add("Low Level", false).withWidget(BuiltInWidgets.kToggleButton).withPosition(1, 0).getEntry().getBoolean(false);
+
         
 
         s_Swerve.setDefaultCommand(
@@ -116,21 +87,6 @@ public class RobotContainer {
             )
         );
 
-        b_Brazo.setDefaultCommand(
-            new ArmControl(
-                b_Brazo,
-                () -> Close.getAsBoolean(),
-                () -> Low.getAsBoolean(),
-                () -> Mid.getAsBoolean(),
-                () -> High.getAsBoolean(),
-                () -> RielAtras.getAsBoolean(),
-                () -> Retraer.getAsBoolean(),
-                () -> Extender.getAsBoolean()
-     )
-        
-    
-        );
-        
 
 
         // Configure the button bindings
@@ -146,11 +102,6 @@ public class RobotContainer {
     private void configureButtonBindings() {
         /* Driver Buttons */
         zeroGyro.onTrue(new InstantCommand(() -> s_Swerve.zeroGyro()));
-
-        Comer.onTrue(new InstantCommand(() -> g_Gripper.come()));
-        Comer.onFalse(new InstantCommand(() -> g_Gripper.quieto()));
-        Escupir.onTrue(new InstantCommand(() -> g_Gripper.escupe()));
-        Escupir.onFalse(new InstantCommand(() -> g_Gripper.quieto()));
     }
     
 
