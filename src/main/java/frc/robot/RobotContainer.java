@@ -46,6 +46,13 @@ public class RobotContainer {
     private final JoystickButton turboBumper = new JoystickButton(driver, XboxController.Button.kLeftStick.value);
     private final JoystickButton precisionBumper = new JoystickButton(driver, XboxController.Button.kRightBumper.value);
     private final JoystickButton AutoPilot = new JoystickButton(driver, XboxController.Button.kA.value);
+
+    private final POVButton lockFront = new POVButton(driver, 0);
+    private final POVButton lockBack = new POVButton(driver, 180);
+    private final POVButton lockLeft = new POVButton(driver, 90);
+    private final POVButton lockRight = new POVButton(driver, 270);
+    
+
    
 
     /* Subsystems */
@@ -82,7 +89,11 @@ public class RobotContainer {
                 () -> robotCentric.getAsBoolean(),
                 () -> turboBumper.getAsBoolean(),
                 () -> precisionBumper.getAsBoolean(),
-                () -> AutoPilot.getAsBoolean()
+                () -> AutoPilot.getAsBoolean(),
+                () -> lockFront.getAsBoolean(),
+                () -> lockBack.getAsBoolean(),
+                () -> lockLeft.getAsBoolean(),
+                () -> lockRight.getAsBoolean()
                 
             )
         );

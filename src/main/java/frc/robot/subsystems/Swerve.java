@@ -12,6 +12,7 @@ import com.ctre.phoenix.sensors.Pigeon2;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -32,6 +33,7 @@ public class Swerve extends SubsystemBase {
     public SwerveDriveOdometry swerveOdometry;
     public SwerveModule[] mSwerveMods;
     public Pigeon2 gyro;
+    public PIDController anglePID = new PIDController(0, 0, 0);
     
 
     public Swerve() {
@@ -65,9 +67,30 @@ public class Swerve extends SubsystemBase {
                                     getYaw()
                                 )
                                 : new ChassisSpeeds(
-                                    translation.getX()*-1, 
-                                    translation.getY()*-1, 
+                                    translation.getX(), 
+                                    translation.getY(), 
                                     rotation)
+                                );
+        SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.Swerve.maxSpeed);
+
+        for(SwerveModule mod : mSwerveMods){
+            mod.setDesiredState(swerveModuleStates[mod.moduleNumber], isOpenLoop);
+        }
+    }    
+
+    public void lockedrive(Translation2d translation, boolean fieldRelative, boolean isOpenLoop, double setPoint) {
+        SwerveModuleState[] swerveModuleStates =
+            Constants.Swerve.swerveKinematics.toSwerveModuleStates(
+                fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(
+                                    translation.getX(), 
+                                    translation.getY(), 
+                                    MathUtil.clamp(anglePID.calculate(gyro.getYaw(), setPoint), -1, 1), 
+                                    getYaw()
+                                )
+                                : new ChassisSpeeds(
+                                    translation.getX(), 
+                                    translation.getY(), 
+                                    MathUtil.clamp(anglePID.calculate(gyro.getYaw(), setPoint), -1, 1))
                                 );
         SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.Swerve.maxSpeed);
 

@@ -7,7 +7,7 @@ import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.MathUtil;
-
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
@@ -25,13 +25,20 @@ public class TeleopSwerve extends CommandBase {
     private BooleanSupplier turboBumper;
     private BooleanSupplier precisionBumper;
     private BooleanSupplier AutoPilot;
+    private Boolean front;
+    private Boolean back;
+    private Boolean left;
+    private Boolean right;
+
     
 
     DigitalOutput ledport1 = new DigitalOutput(0);
     DigitalOutput ledport2 = new DigitalOutput(1);
 
+    
 
-    public TeleopSwerve(Swerve s_Swerve, DoubleSupplier translationSup, DoubleSupplier strafeSup, DoubleSupplier rotationSup, BooleanSupplier robotCentricSup, BooleanSupplier turboBumper, BooleanSupplier precisionBumper, BooleanSupplier AutoPilot) {
+
+    public TeleopSwerve(Swerve s_Swerve, DoubleSupplier translationSup, DoubleSupplier strafeSup, DoubleSupplier rotationSup, BooleanSupplier robotCentricSup, BooleanSupplier turboBumper, BooleanSupplier precisionBumper, BooleanSupplier AutoPilot, BooleanSupplier front,BooleanSupplier back,BooleanSupplier left,BooleanSupplier right) {
         this.s_Swerve = s_Swerve;
         addRequirements(s_Swerve);
 
@@ -42,6 +49,10 @@ public class TeleopSwerve extends CommandBase {
         this.turboBumper = turboBumper;
         this.precisionBumper = precisionBumper;
         this.AutoPilot = AutoPilot;
+        this.front=front.getAsBoolean();
+        this.back=back.getAsBoolean();
+        this.left=left.getAsBoolean();
+        this.right=right.getAsBoolean();
 
         
     }
@@ -52,6 +63,7 @@ public class TeleopSwerve extends CommandBase {
         double translationVal = (Math.pow(MathUtil.applyDeadband(translationSup.getAsDouble(), Constants.stickDeadband), 1));
         double strafeVal = (Math.pow(MathUtil.applyDeadband(strafeSup.getAsDouble(), Constants.stickDeadband), 1));
         double rotationVal = Math.pow(MathUtil.applyDeadband(rotationSup.getAsDouble(), Constants.stickDeadband), 1);
+        double targetAngle=0;
 
         /* Drive */
         if(turboBumper.getAsBoolean()==true){
@@ -75,6 +87,27 @@ public class TeleopSwerve extends CommandBase {
         );
         }
         else if(AutoPilot.getAsBoolean()==true){
+        }
+        else if(front==true || back==true||left==true||right==true){
+            if(front==true){
+                targetAngle=0;
+            }
+            else if(back==true){
+                targetAngle=180;
+            }
+            else if(left==true){
+                targetAngle=90;
+            }
+            else if(right==true){
+                targetAngle=270;
+            }
+
+            s_Swerve.lockedrive(
+            new Translation2d(translationVal, strafeVal).times(Constants.Swerve.maxSpeed),  
+            !robotCentricSup.getAsBoolean(), 
+            true, targetAngle
+        );
+            
         }
         else{
             ledport1.set(false);
