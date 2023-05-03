@@ -12,12 +12,15 @@ import com.ctre.phoenix.sensors.Pigeon2;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -25,18 +28,24 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import com.pathplanner.lib.PathConstraints;
-import com.pathplanner.lib.PathPlanner;
-import com.pathplanner.lib.PathPoint;
+
 
 public class Swerve extends SubsystemBase {
     public SwerveDriveOdometry swerveOdometry;
+    public SwerveDrivePoseEstimator SwervePoseEstimator;
     public SwerveModule[] mSwerveMods;
     public Pigeon2 gyro;
-    public PIDController anglePID = new PIDController(0, 0, 0);
+    public PIDController anglePID ;
+    
     
 
+
     public Swerve() {
+        anglePID = new PIDController(0.005, 0, 0);
+        anglePID.enableContinuousInput(0, 360);
+
+
+
         gyro = new Pigeon2(Constants.Swerve.pigeonID);
         gyro.configFactoryDefault();
         zeroGyro();
@@ -55,8 +64,13 @@ public class Swerve extends SubsystemBase {
         resetModulesToAbsolute();
 
         swerveOdometry = new SwerveDriveOdometry(Constants.Swerve.swerveKinematics, getYaw(), getModulePositions());
-    }
 
+        SwervePoseEstimator = new SwerveDrivePoseEstimator(Constants.Swerve.swerveKinematics, getYaw(), getModulePositions(), getPose());
+
+
+
+    }
+    /*Default drive state for teleop */
     public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
         SwerveModuleState[] swerveModuleStates =
             Constants.Swerve.swerveKinematics.toSwerveModuleStates(
@@ -77,20 +91,21 @@ public class Swerve extends SubsystemBase {
             mod.setDesiredState(swerveModuleStates[mod.moduleNumber], isOpenLoop);
         }
     }    
-
+    
+    /*Drive state with rotation locked to cardinal directions */
     public void lockedrive(Translation2d translation, boolean fieldRelative, boolean isOpenLoop, double setPoint) {
         SwerveModuleState[] swerveModuleStates =
             Constants.Swerve.swerveKinematics.toSwerveModuleStates(
                 fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(
                                     translation.getX(), 
                                     translation.getY(), 
-                                    MathUtil.clamp(anglePID.calculate(gyro.getYaw(), setPoint), -1, 1), 
+                                    anglePID.calculate(gyro.getYaw(), setPoint), 
                                     getYaw()
                                 )
                                 : new ChassisSpeeds(
                                     translation.getX(), 
                                     translation.getY(), 
-                                    MathUtil.clamp(anglePID.calculate(gyro.getYaw(), setPoint), -1, 1))
+                                    anglePID.calculate(gyro.getYaw(), setPoint))
                                 );
         SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.Swerve.maxSpeed);
 
@@ -98,7 +113,7 @@ public class Swerve extends SubsystemBase {
             mod.setDesiredState(swerveModuleStates[mod.moduleNumber], isOpenLoop);
         }
     }    
-
+    
     /* Used by SwerveControllerCommand in Auto */
     public void setModuleStates(SwerveModuleState[] desiredStates) {
         SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, Constants.Swerve.maxSpeed);
@@ -119,7 +134,7 @@ public class Swerve extends SubsystemBase {
     public Pose2d getPose() {
         return swerveOdometry.getPoseMeters();
     }
-
+    
     public void resetOdometry(Pose2d pose) {
         swerveOdometry.resetPosition(getYaw(), getModulePositions(), pose);
     }
@@ -154,23 +169,28 @@ public class Swerve extends SubsystemBase {
         }
     }
 
+    public double getArea(){
+        NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
+        NetworkTableEntry ta = table.getEntry("ta");
+        double a = ta.getDouble(0.0);
+        return a;
+      }
 
-    @Override
-    public void periodic(){
-
-        swerveOdometry.update(getYaw(), getModulePositions());  
-
-        for(SwerveModule mod : mSwerveMods){
-            SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Cancoder", mod.getCanCoder().getDegrees());
-            SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Integrated", mod.getPosition().angle.getDegrees());
-            SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Velocity", mod.getState().speedMetersPerSecond);    
-        }
-
-        
-    }
-
+    public double[] getLimeInfo(){
+        /*
+         * 0-x
+         * 1-y
+         * 2-z
+         * 3-Roll
+         * 4-Pitch
+         * 5-Yaw
+         */
+        double[] botposeinfo =NetworkTableInstance.getDefault().getTable("limelight").getEntry("botpose").getDoubleArray(new double[7]);
+        return botposeinfo;
+      }
     
-public Command followTrajectoryCommand(PathPlannerTrajectory traj, boolean isFirstPath) {
+
+    public Command followTrajectoryCommand(PathPlannerTrajectory traj, boolean isFirstPath) {
     return new SequentialCommandGroup(
          new InstantCommand(() -> {
            // Reset odometry for the first path you run during auto
@@ -190,5 +210,42 @@ public Command followTrajectoryCommand(PathPlannerTrajectory traj, boolean isFir
              this // Requires this drive subsystem
          )
      );
+
  }
+
+
+    @Override
+    public void periodic(){
+
+        
+        swerveOdometry.update(getYaw(), getModulePositions());
+
+
+        if(getArea()>0){
+
+            double[] Limeinfo = getLimeInfo();
+            SwervePoseEstimator.addVisionMeasurement(new Pose2d(new Translation2d(Limeinfo[0], Limeinfo[1]), new Rotation2d(Limeinfo[5])), Timer.getFPGATimestamp()-Limeinfo[6]);
+            SwervePoseEstimator.update(getYaw(), getModulePositions());
+            SmartDashboard.putNumber("LimePose X", Limeinfo[0]);  
+            SmartDashboard.putNumber("LimePose Y", Limeinfo[1]);   
+            SmartDashboard.putNumber("Latency", Limeinfo[6]); 
+        }
+        SmartDashboard.putNumber("EncoderPose X", getPose().getX());  
+        SmartDashboard.putNumber("EncoderPose Y", getPose().getY());
+    
+
+        for(SwerveModule mod : mSwerveMods){
+            SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Cancoder", mod.getCanCoder().getDegrees());
+            SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Integrated", mod.getPosition().angle.getDegrees());
+            SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Velocity", mod.getState().speedMetersPerSecond);    
+        }
+
+       
+        
+
+
+    }
+
+    
+
 }
