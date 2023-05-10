@@ -42,7 +42,22 @@ public class TeleopSwerve extends CommandBase {
     
 
 
-    public TeleopSwerve(Limelight l_Limelight, Swerve s_Swerve, DoubleSupplier translationSup, DoubleSupplier strafeSup, DoubleSupplier rotationSup, BooleanSupplier robotCentricSup, BooleanSupplier turboBumper, BooleanSupplier precisionBumper, BooleanSupplier AutoPilot, BooleanSupplier front,BooleanSupplier back,BooleanSupplier left,BooleanSupplier right, BooleanSupplier autoTarget) {
+    public TeleopSwerve(
+    Limelight l_Limelight, 
+    Swerve s_Swerve, 
+    DoubleSupplier translationSup, 
+    DoubleSupplier strafeSup, 
+    DoubleSupplier rotationSup, 
+    BooleanSupplier robotCentricSup, 
+    BooleanSupplier turboBumper, 
+    BooleanSupplier precisionBumper, 
+    BooleanSupplier AutoPilot, 
+    BooleanSupplier front,
+    BooleanSupplier back,
+    BooleanSupplier left,
+    BooleanSupplier right, 
+    BooleanSupplier autoTarget) {
+
         this.s_Swerve = s_Swerve;
         this.l_Limelight=l_Limelight;
         addRequirements(s_Swerve, l_Limelight);
@@ -75,8 +90,7 @@ public class TeleopSwerve extends CommandBase {
         
         /* Turbo Drive (Increases mas speeds for rotation and translation)*/
         if(turboBumper.getAsBoolean()==true){
-            ledport1.set(true);
-            ledport2.set(false);
+
             l_Limelight.SelectPipeline(1);
             l_Limelight.LEDsOFF();
             s_Swerve.drive(
@@ -88,8 +102,7 @@ public class TeleopSwerve extends CommandBase {
         }
         /*Precision Drive (Reduces max speeds for both rotation and translation)*/
         else if(precisionBumper.getAsBoolean()==true){
-            ledport1.set(false);
-            ledport2.set(true);
+
             l_Limelight.SelectPipeline(1);
             l_Limelight.LEDsOFF();
             s_Swerve.drive(
@@ -101,6 +114,8 @@ public class TeleopSwerve extends CommandBase {
         }
         /*Autpilot to pose */
         else if(AutoPilot.getAsBoolean()==true){
+            
+            
         }
 
         /*Lock robot to specific angles (Disables rotation joystick while specific orientation is selected) */
@@ -117,6 +132,7 @@ public class TeleopSwerve extends CommandBase {
             else if(right.getAsBoolean()==true){
                 targetAngle=270;
             }
+
             l_Limelight.SelectPipeline(1);
             l_Limelight.LEDsOFF();
             s_Swerve.lockedrive(

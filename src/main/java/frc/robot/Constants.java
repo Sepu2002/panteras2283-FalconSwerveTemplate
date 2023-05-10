@@ -3,6 +3,7 @@ package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -157,6 +158,26 @@ public final class Constants {
             new TrapezoidProfile.Constraints(
                 kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
     }
+
+    
+   /*List of all the target destinations desired for autopilot */
+    public static final Pose2d[] AutoPilotLocations = {
+
+        new Pose2d(new Translation2d(3.8,2.7),new Rotation2d(0)),
+
+        new Pose2d(new Translation2d(1.88,5),new Rotation2d(180)),
+        new Pose2d(new Translation2d(1.88,4.43),new Rotation2d(180)),
+        new Pose2d(new Translation2d(1.88,3.86),new Rotation2d(180)),
+        new Pose2d(new Translation2d(1.88,3.33),new Rotation2d(180)),
+        new Pose2d(new Translation2d(1.88,2.74),new Rotation2d(180)),
+        new Pose2d(new Translation2d(1.88,2.18),new Rotation2d(180)),
+        new Pose2d(new Translation2d(1.88,1.62),new Rotation2d(180)),
+        new Pose2d(new Translation2d(1.88,1.06),new Rotation2d(180)),
+        new Pose2d(new Translation2d(1.88,0.49),new Rotation2d(180)),
+        new Pose2d(new Translation2d(13.58,7.49),new Rotation2d(270))
+       
+
+    };
 
 
 }
