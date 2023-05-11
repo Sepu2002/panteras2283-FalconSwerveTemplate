@@ -63,5 +63,9 @@ These instructions are mostly followable from Step
 This code is natively setup to use a xbox controller to control the swerve drive. </br>
 * Left Stick: Translation Control (forwards and sideways movement)
 * Right Stick: Rotation Control </br>
-* Y button: Zero Gyro (useful if the gyro drifts mid match, just rotate the robot forwards, and press Y to rezero)
+* POV 0 button: Zero Gyro (useful if the gyro drifts mid match, just rotate the robot forwards, and press Y to rezero)
 * Left Bumper: Switches To Robot Centric Control while held
+* Left Stick Press: Increases top speed and acceleraton (Recomended use only in straight lines)
+* Right Bumper: Reduces top speed and rotaton for precise movements
+* A,B,X,Y Buttons: Auto rotates robot to cardinal angles (180,270,90,0)
+
