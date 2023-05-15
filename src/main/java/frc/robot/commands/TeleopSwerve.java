@@ -7,6 +7,8 @@ import frc.robot.subsystems.Swerve;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
+import com.pathplanner.lib.PathPlannerTrajectory;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -114,8 +116,9 @@ public class TeleopSwerve extends CommandBase {
         }
         /*Autpilot to pose */
         else if(AutoPilot.getAsBoolean()==true){
-            
-            
+
+            PathPlannerTrajectory traj= s_Swerve.generate_AP_Path();
+            s_Swerve.followTrajectoryCommand(traj,false);
         }
 
         /*Lock robot to specific angles (Disables rotation joystick while specific orientation is selected) */
