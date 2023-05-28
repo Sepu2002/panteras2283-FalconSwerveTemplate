@@ -1,6 +1,5 @@
 package frc.robot;
 
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
@@ -12,11 +11,13 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import frc.robot.autos.PathPlanerAuto;
+import frc.robot.commands.AutoDriveToPosition;
+import frc.robot.commands.PrecisionTeleopSwerve;
 import frc.robot.commands.TeleopSwerve;
+import frc.robot.commands.TurboTeleopSwerve;
+import frc.robot.commands.VirtualLimelightTurret;
 import frc.robot.subsystems.Limelight;
 import frc.robot.subsystems.Swerve;
-
-
 
 
 
@@ -51,15 +52,15 @@ public class RobotContainer {
     
     
     /*Operator buttons */
-    private final JoystickButton one = new JoystickButton(operator,1);
+    //private final JoystickButton one = new JoystickButton(operator,1);
     private final JoystickButton two = new JoystickButton(operator,2);
     private final JoystickButton three = new JoystickButton(operator,3);
-    private final JoystickButton four = new JoystickButton(operator,4);
-    private final JoystickButton five = new JoystickButton(operator,5);
-    private final JoystickButton six = new JoystickButton(operator,6);
-    private final JoystickButton seven = new JoystickButton(operator,7);
-    private final JoystickButton eight = new JoystickButton(operator,8);
-    private final JoystickButton nine = new JoystickButton(operator,9);
+    //private final JoystickButton four = new JoystickButton(operator,4);
+    //private final JoystickButton five = new JoystickButton(operator,5);
+    //private final JoystickButton six = new JoystickButton(operator,6);
+    //private final JoystickButton seven = new JoystickButton(operator,7);
+    //private final JoystickButton eight = new JoystickButton(operator,8);
+    //private final JoystickButton nine = new JoystickButton(operator,9);
     //private final JoystickButton high = new JoystickButton(operator,10);
 
     private final JoystickButton autoTarget = new JoystickButton(operator, 14);
@@ -94,14 +95,10 @@ public class RobotContainer {
                 () -> -driver.getRawAxis(strafeAxis), 
                 () -> -driver.getRawAxis(rotationAxis), 
                 () -> robotCentric.getAsBoolean(),
-                () -> turboBumper.getAsBoolean(),
-                () -> precisionBumper.getAsBoolean(),
-                () -> AutoPilot.getAsBoolean(),
                 () -> lockFront.getAsBoolean(),
                 () -> lockBack.getAsBoolean(),
                 () -> lockLeft.getAsBoolean(),
-                () -> lockRight.getAsBoolean(),
-                () -> autoTarget.getAsBoolean()
+                () -> lockRight.getAsBoolean()
                 
             )
         );
@@ -120,20 +117,67 @@ public class RobotContainer {
      */
     private void configureButtonBindings() {
         /* Driver Buttons */
+        turboBumper.onTrue(
+        new TurboTeleopSwerve(
+            l_Limelight, 
+            s_Swerve, 
+            () -> -driver.getRawAxis(translationAxis), 
+            () -> -driver.getRawAxis(strafeAxis), 
+            () -> -driver.getRawAxis(rotationAxis), 
+            () -> robotCentric.getAsBoolean()
+        ));
+
+        turboBumper.onFalse(
+            s_Swerve.getDefaultCommand()
+        );
+
+        precisionBumper.onTrue(
+        new PrecisionTeleopSwerve(
+        l_Limelight, 
+        s_Swerve, 
+        () -> -driver.getRawAxis(translationAxis), 
+        () -> -driver.getRawAxis(strafeAxis), 
+        () -> -driver.getRawAxis(rotationAxis), 
+        () -> robotCentric.getAsBoolean(),
+        () -> lockFront.getAsBoolean(),
+        () -> lockBack.getAsBoolean(),
+        () -> lockLeft.getAsBoolean(),
+        () -> lockRight.getAsBoolean()
+        ));
+
+        precisionBumper.onFalse(
+            s_Swerve.getDefaultCommand()
+        );
+
+        autoTarget.onTrue(
+        new VirtualLimelightTurret(
+        l_Limelight, 
+        s_Swerve, 
+        () -> -driver.getRawAxis(translationAxis), 
+        () -> -driver.getRawAxis(strafeAxis), 
+        () -> -driver.getRawAxis(rotationAxis), 
+        () -> robotCentric.getAsBoolean()
+        ));
+
+        autoTarget.onFalse(
+            s_Swerve.getDefaultCommand()
+        );
+
+        
+
+        AutoPilot.onTrue(
+        new AutoDriveToPosition(l_Limelight, s_Swerve)
+        );
+
+        AutoPilot.onFalse(
+            s_Swerve.getDefaultCommand()
+        );
+
         zeroGyro.onTrue(new InstantCommand(() -> s_Swerve.zeroGyro()));
         calibrateEstimation.onTrue(new InstantCommand(()-> s_Swerve.VisionResetEstimation()));
         //one.onTrue(new InstantCommand(()-> s_Swerve.AutoPilotDestinationSelector(1)));
         two.onTrue(new InstantCommand(()-> s_Swerve.AutoPilotDestinationSelector(2)));
-        three.onTrue(new InstantCommand(()-> s_Swerve.AutoPilotDestinationSelector(3)));
-        //four.onTrue(new InstantCommand(()-> s_Swerve.AutoPilotDestinationSelector(4)));
-        //five.onTrue(new InstantCommand(()-> s_Swerve.AutoPilotDestinationSelector(5)));
-        //six.onTrue(new InstantCommand(()-> s_Swerve.AutoPilotDestinationSelector(6)));
-        //seven.onTrue(new InstantCommand(()-> s_Swerve.AutoPilotDestinationSelector(7)));
-        //eight.onTrue(new InstantCommand(()-> s_Swerve.AutoPilotDestinationSelector(8)));
-        //nine.onTrue(new InstantCommand(()-> s_Swerve.AutoPilotDestinationSelector(9)));
-        //ten.onTrue(new InstantCommand(()-> s_Swerve.AutoPilotDestinationSelector(10)));
-
-        
+        three.onTrue(new InstantCommand(()-> s_Swerve.AutoPilotDestinationSelector(3)));   
         
     }
     
