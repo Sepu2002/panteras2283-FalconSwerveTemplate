@@ -244,8 +244,8 @@ public class Swerve extends SubsystemBase {
     public PathPlannerTrajectory generate_AP_Path(){
 
         PathPlannerTrajectory traj = PathPlanner.generatePath(
-        new PathConstraints(4, 3), 
-        new PathPoint(new Translation2d(getPose().getX(), getPose().getY()), Rotation2d.fromDegrees(0), Rotation2d.fromDegrees(gyro.getYaw())), 
+        new PathConstraints(4, 3),  
+        new PathPoint(new Translation2d(Constants.AutoPilotLocations[AutoPilotTarget].getX()/2, Constants.AutoPilotLocations[AutoPilotTarget].getY()/2), Rotation2d.fromDegrees(45), Constants.AutoPilotLocations[AutoPilotTarget].getRotation()),
         new PathPoint(new Translation2d(Constants.AutoPilotLocations[AutoPilotTarget].getX(), Constants.AutoPilotLocations[AutoPilotTarget].getY()), Rotation2d.fromDegrees(45), Constants.AutoPilotLocations[AutoPilotTarget].getRotation()));
 
         return traj;

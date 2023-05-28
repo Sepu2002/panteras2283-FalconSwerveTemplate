@@ -17,8 +17,6 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj.DigitalOutput;
 
 
-
-
 public class TeleopSwerve extends CommandBase {    
     private Swerve s_Swerve;    
     private Limelight l_Limelight;
@@ -114,12 +112,14 @@ public class TeleopSwerve extends CommandBase {
             true
         );
         }
-        /*Autpilot to pose */
-        else if(AutoPilot.getAsBoolean()==true){
+        /*Autpilot to pose 
+                 else if(AutoPilot.getAsBoolean()==true){
 
             PathPlannerTrajectory traj= s_Swerve.generate_AP_Path();
             s_Swerve.followTrajectoryCommand(traj,false);
-        }
+        } 
+        */
+
 
         /*Lock robot to specific angles (Disables rotation joystick while specific orientation is selected) */
         else if(front.getAsBoolean()==true || back.getAsBoolean()==true||left.getAsBoolean()==true||right.getAsBoolean()==true){
